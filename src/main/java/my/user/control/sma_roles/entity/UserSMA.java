@@ -1,5 +1,6 @@
 package my.user.control.sma_roles.entity;
 import java.util.Collection;
+import java.util.HashSet;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -9,11 +10,18 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import jakarta.persistence.Table;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Column;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.Set;
+import my.user.control.sma_roles.entity.RoleSMA;
 
 
 @Entity
@@ -58,7 +66,15 @@ public class UserSMA implements UserDetails { // user of steam market analisys s
         this.token = token;
     }
 
-    // 
+    @ManyToMany(fetch = FetchType.EAGER) // EAGER ensures roles load with the user
+    @JoinTable(
+        name = "user_roles",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<RoleSMA> roles = new HashSet<>();
+
+
     public Collection<SimpleGrantedAuthority> getAuthorities() {
         return authorities;
     }
