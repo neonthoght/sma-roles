@@ -65,7 +65,7 @@ public class UserSMA implements UserDetails { // user of steam market analisys s
         this.email = email;
         this.token = token;
     }
-
+    //в id подставляется не цифра, а username - из-за этого ошибка
     @ManyToMany(fetch = FetchType.EAGER) // EAGER ensures roles load with the user
     @JoinTable(
         name = "auth.user_roles",
