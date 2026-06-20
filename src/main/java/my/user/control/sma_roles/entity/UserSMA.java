@@ -68,7 +68,7 @@ public class UserSMA implements UserDetails { // user of steam market analisys s
 
     @ManyToMany(fetch = FetchType.EAGER) // EAGER ensures roles load with the user
     @JoinTable(
-        name = "user_roles",
+        name = "auth.user_roles",
         joinColumns = @JoinColumn(name = "user_id"),
         inverseJoinColumns = @JoinColumn(name = "role_id")
     )
