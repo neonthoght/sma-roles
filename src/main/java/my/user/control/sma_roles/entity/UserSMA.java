@@ -49,7 +49,7 @@ public class UserSMA implements UserDetails { // user of steam market analisys s
     @Column(name = "token")
     UUID token;
 
-    Collection<SimpleGrantedAuthority> authorities;
+    //Collection<SimpleGrantedAuthority> authorities;
 
     //default constructor. Не удалять!
     UserSMA() {}
@@ -74,9 +74,11 @@ public class UserSMA implements UserDetails { // user of steam market analisys s
     )
     private Set<RoleSMA> roles = new HashSet<>();
 
-
+    // получить роли польозвателя
     public Collection<SimpleGrantedAuthority> getAuthorities() {
-        return authorities;
+        return roles.stream()
+        .map(role -> new SimpleGrantedAuthority(role.getName()))
+        .collect(Collectors.toList());
     }
 
     public String getId() {
