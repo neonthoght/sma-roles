@@ -21,7 +21,7 @@ public class UserSMAController {
 
     @GetMapping("/rights")
     public ResponseEntity<String> getRights(@RequestParam String user) {
-        return ResponseEntity.ok(userService.loadUserByUsername(user).getAuthorities().toArray().toString());
+        return ResponseEntity.ok(userService.loadUserByUsername(user).getAuthorities().toString());
     }
     
 }

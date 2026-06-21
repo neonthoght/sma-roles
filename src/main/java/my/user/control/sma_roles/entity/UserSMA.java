@@ -68,7 +68,8 @@ public class UserSMA implements UserDetails { // user of steam market analisys s
     //в id подставляется не цифра, а username - из-за этого ошибка
     @ManyToMany(fetch = FetchType.EAGER) // EAGER ensures roles load with the user
     @JoinTable(
-        name = "auth.user_roles",
+        name = "user_roles",
+        schema = "auth",
         joinColumns = @JoinColumn(name = "user_id"),
         inverseJoinColumns = @JoinColumn(name = "role_id")
     )
