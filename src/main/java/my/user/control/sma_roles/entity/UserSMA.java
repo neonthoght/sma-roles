@@ -73,12 +73,13 @@ public class UserSMA implements UserDetails { // user of steam market analisys s
         joinColumns = @JoinColumn(name = "user_id"),
         inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    private Set<RoleSMA> roles = new HashSet<>();
+    public Set<RoleSMA> roles = new HashSet<>();
 
     // получить роли польозвателя
-    public Collection<SimpleGrantedAuthority> getAuthorities() {
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()
-        .map(role -> new SimpleGrantedAuthority(role.getName()))
+        .map(role -> new SimpleGrantedAuthority("ROLE_"+role.getName()))
         .collect(Collectors.toList());
     }
 
@@ -124,6 +125,10 @@ public class UserSMA implements UserDetails { // user of steam market analisys s
 
     public boolean getIsActive() {
         return this.isActive;
+    }
+
+    public Set<RoleSMA> getRoles() {
+        return roles;
     }
 
     public void setIsActive(boolean isActive) {
