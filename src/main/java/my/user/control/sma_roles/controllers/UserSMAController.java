@@ -1,18 +1,23 @@
 package my.user.control.sma_roles.controllers;
 
 import my.user.control.sma_roles.entity.UserSMA;
+import my.user.control.sma_roles.repositories.UserSMARepository;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.Authentication;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,6 +25,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.web.bind.annotation.RequestBody;
 //import my.user.control.sma_roles.repositories.UserSMARepository;
+import org.springframework.security.core.context.SecurityContextHolderStrategy;
+import org.springframework.security.core.context.ListeningSecurityContextHolderStrategy;
+
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import my.user.control.sma_roles.services.UserSMADetailService;
 
@@ -27,12 +36,19 @@ import my.user.control.sma_roles.services.UserSMADetailService;
 @RequestMapping("/auth")
 public class UserSMAController {
 
+    private SecurityContextHolderStrategy securityContextHolderStrategy = new ListeningSecurityContextHolderStrategy();
     private SecurityContextRepository securityContextRepository = new HttpSessionSecurityContextRepository();
+    @Autowired
+    public UserSMARepository userRepo;
     UserSMADetailService userService;
-    private final AuthenticationManager authenticationManager;
+    DaoAuthenticationProvider authProvider;
+    private AuthenticationManager authenticationManager;
 
     public UserSMAController(UserSMADetailService userService) {
         this.userService = userService;
+        authProvider = new DaoAuthenticationProvider(userService);
+        authenticationManager = new ProviderManager(authProvider);
+        authProvider.setPasswordEncoder(new BCryptPasswordEncoder());
     }
 
     // поправить метод, сделал солянку из гугловского ответа и мануала документации спринг
@@ -42,6 +58,10 @@ public class UserSMAController {
         UsernamePasswordAuthenticationToken token = UsernamePasswordAuthenticationToken.unauthenticated(user.getUsername(), user.getPassword());
         Authentication authentication = authenticationManager.authenticate(token); 
         SecurityContext context = securityContextHolderStrategy.createEmptyContext();
+
+        //DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userService);
+        //authenticationManager = new ProviderManager(authProvider);
+
         context.setAuthentication(authentication); 
         securityContextHolderStrategy.setContext(context);
         securityContextRepository.saveContext(context, request, response); 
