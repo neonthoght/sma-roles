@@ -35,15 +35,18 @@ import my.user.control.sma_roles.services.UserSMADetailService;
 @Controller
 @RequestMapping("/auth")
 public class UserSMAController {
-
-    private SecurityContextHolderStrategy securityContextHolderStrategy = new ListeningSecurityContextHolderStrategy();
-    private SecurityContextRepository securityContextRepository = new HttpSessionSecurityContextRepository();
+    
     @Autowired
     public UserSMARepository userRepo;
     UserSMADetailService userService;
-    DaoAuthenticationProvider authProvider;
-    private AuthenticationManager authenticationManager;
+    //private AuthenticationManager authenticationManager;
 
+    public UserSMAController (UserSMADetailService userService) {
+        this.userService = userService;
+
+    }
+
+    /* 
     public UserSMAController(UserSMADetailService userService) {
         this.userService = userService;
         authProvider = new DaoAuthenticationProvider(userService);
@@ -53,6 +56,7 @@ public class UserSMAController {
 
     // поправить метод, сделал солянку из гугловского ответа и мануала документации спринг
     // сама дока https://docs.spring.io/spring-security/reference/servlet/authentication/session-management.html
+    
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody UserSMA user,  HttpServletRequest request, HttpServletResponse response) {
         UsernamePasswordAuthenticationToken token = UsernamePasswordAuthenticationToken.unauthenticated(user.getUsername(), user.getPassword());
@@ -67,6 +71,7 @@ public class UserSMAController {
         securityContextRepository.saveContext(context, request, response); 
         return ResponseEntity.ok("OK");
     }
+    */
 
     @GetMapping("/rights")
     public ResponseEntity<String> getRights(@RequestParam String user) {

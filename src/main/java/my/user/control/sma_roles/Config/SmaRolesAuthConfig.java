@@ -28,8 +28,8 @@ public class SmaRolesAuthConfig {
             //    .anyRequest().authenticated()
             //)
             .securityMatcher("/auth/**")
-            .authorizeHttpRequests( req -> req.requestMatchers("/auth/rights").permitAll())
-            .authorizeHttpRequests( req -> req.requestMatchers("/auth/**").permitAll())
+            .authorizeHttpRequests( req -> req.requestMatchers("/auth/login").permitAll())
+            .authorizeHttpRequests( req -> req.requestMatchers("/auth/**").authenticated())
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.ALWAYS) // Enable session creation
             );
