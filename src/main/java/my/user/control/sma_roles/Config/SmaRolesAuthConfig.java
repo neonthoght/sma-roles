@@ -29,7 +29,8 @@ public class SmaRolesAuthConfig {
             //)
             .securityMatcher("/auth/**")
             .authorizeHttpRequests( req -> req.requestMatchers("/auth/login").permitAll())
-            .authorizeHttpRequests( req -> req.requestMatchers("/auth/**").authenticated())
+            .authorizeHttpRequests( req -> req.requestMatchers("/auth/hello").hasRole("CSGO"))
+            .authorizeHttpRequests( req -> req.requestMatchers("/auth/rights").hasRole("RIGHTS"))
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.ALWAYS) // Enable session creation
             );
