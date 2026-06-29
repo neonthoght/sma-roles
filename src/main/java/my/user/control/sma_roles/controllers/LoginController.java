@@ -43,9 +43,7 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody UserSMA loginRequest, 
-                    HttpServletRequest request, 
-                    HttpServletResponse response) {
+    public ResponseEntity<String> login(@RequestBody UserSMA loginRequest, HttpServletRequest request, HttpServletResponse response) {
 
         try {
             UsernamePasswordAuthenticationToken token = UsernamePasswordAuthenticationToken.authenticated(
@@ -57,18 +55,18 @@ public class LoginController {
             System.out.println("is authenticated: " + token.isAuthenticated());
             
             UserDetails user = userSMAService.loadUserByUsername(loginRequest.getUsername());
-            // 3. Verify user credentials
+            // 3. Verify user credentials. Проверяем пользователя. Вернёт ошибку если будет введён неправильный пароль.
             Authentication authentication = authenticationManager.authenticate(token);
             System.out.println(user.getUsername() + " " + user.getPassword() + " " + user.getAuthorities());
 
-            // 4. Create an empty context and assign the authenticated token
+            // 4. Create an empty context and assign the authenticated token. Создаем пустой контекст и назначаем токен авторизации
             SecurityContext context = securityContextHolderStrategy.createEmptyContext();
             context.setAuthentication(authentication);
 
-            // 5. Update the local thread strategy
+            // 5. Update the local thread strategy Сохраняем контекст локально в самом приложении
             securityContextHolderStrategy.setContext(context);
 
-            // 6. Explicitly save the context to the repository (Session/Cookies)
+            // 6. Explicitly save the context to the repository (Session/Cookies) / Сохраняем контекст в репозитории
             securityContextRepository.saveContext(context, request, response);
         } catch (BadCredentialsException e) {
             System.out.println(e + " (неправильный логин/пароль)");
