@@ -1,5 +1,6 @@
 package my.user.control.sma_roles.controllers;
 
+import my.user.control.sma_roles.entity.ChangePasswordSMA;
 import my.user.control.sma_roles.entity.UserSMA;
 import my.user.control.sma_roles.repositories.UserSMARepository;
 
@@ -26,8 +27,9 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.web.bind.annotation.RequestBody;
 //import my.user.control.sma_roles.repositories.UserSMARepository;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.context.ListeningSecurityContextHolderStrategy;
-
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import my.user.control.sma_roles.services.UserSMADetailService;
@@ -46,32 +48,18 @@ public class UserSMAController {
 
     }
 
-    /* 
-    public UserSMAController(UserSMADetailService userService) {
-        this.userService = userService;
-        authProvider = new DaoAuthenticationProvider(userService);
-        authenticationManager = new ProviderManager(authProvider);
-        authProvider.setPasswordEncoder(new BCryptPasswordEncoder());
+    @PostMapping("/change-password")
+    public ResponseEntity<String> changePassword(
+            @RequestBody ChangePasswordSMA dto,
+            @AuthenticationPrincipal UserDetails currentUser) {
+        
+        try {
+            userService.changeUserPassword(currentUser.getUsername(), dto);
+            return ResponseEntity.ok("Password updated successfully!");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
-
-    // поправить метод, сделал солянку из гугловского ответа и мануала документации спринг
-    // сама дока https://docs.spring.io/spring-security/reference/servlet/authentication/session-management.html
-    
-    @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody UserSMA user,  HttpServletRequest request, HttpServletResponse response) {
-        UsernamePasswordAuthenticationToken token = UsernamePasswordAuthenticationToken.unauthenticated(user.getUsername(), user.getPassword());
-        Authentication authentication = authenticationManager.authenticate(token); 
-        SecurityContext context = securityContextHolderStrategy.createEmptyContext();
-
-        //DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userService);
-        //authenticationManager = new ProviderManager(authProvider);
-
-        context.setAuthentication(authentication); 
-        securityContextHolderStrategy.setContext(context);
-        securityContextRepository.saveContext(context, request, response); 
-        return ResponseEntity.ok("OK");
-    }
-    */
 
     @GetMapping("/rights")
     public ResponseEntity<String> getRights(@RequestParam String user) {
