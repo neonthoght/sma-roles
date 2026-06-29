@@ -1,4 +1,4 @@
-package my.user.control.sma_roles.Config;
+package my.user.control.sma_roles.config;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -29,8 +29,8 @@ public class SmaRolesAuthConfig {
             //)
             .securityMatcher("/auth/**")
             .authorizeHttpRequests( req -> req.requestMatchers("/auth/login").permitAll())
-            .authorizeHttpRequests( req -> req.requestMatchers("/auth/hello").hasRole("CSGO"))
-            .authorizeHttpRequests( req -> req.requestMatchers("/auth/rights").hasRole("RIGHTS"))
+            .authorizeHttpRequests( req -> req.requestMatchers("/auth/hello").hasRole("HELLO"))
+            .authorizeHttpRequests( req -> req.requestMatchers("/auth/rights").authenticated())
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.ALWAYS) // Enable session creation
             );
@@ -43,15 +43,15 @@ public class SmaRolesAuthConfig {
     }
 
     @Bean
-public AuthenticationManager authenticationManager(
-            UserDetailsService userDetailsService,
-            PasswordEncoder passwordEncoder) {
-        // DaoAuthenticationProvider is a common provider that uses UserDetailsService
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
-        //authProvider.setUserDetailsService(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder);
+    public AuthenticationManager authenticationManager(
+                UserDetailsService userDetailsService,
+                PasswordEncoder passwordEncoder) {
+            // DaoAuthenticationProvider is a common provider that uses UserDetailsService
+            DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
+            //authProvider.setUserDetailsService(userDetailsService);
+            authProvider.setPasswordEncoder(passwordEncoder);
 
-        // ProviderManager is the default implementation of AuthenticationManager
-        return new ProviderManager(authProvider);
-    }
+            // ProviderManager is the default implementation of AuthenticationManager
+            return new ProviderManager(authProvider);
+        }
 }

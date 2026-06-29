@@ -2,6 +2,7 @@ package my.user.control.sma_roles.controllers;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import my.user.control.sma_roles.entity.UserSMA;
 import my.user.control.sma_roles.services.UserSMADetailService;
+import org.springframework.security.authentication.BadCredentialsException;
 
 @RestController
 @RequestMapping("/auth")
@@ -34,7 +36,7 @@ public class LoginController {
     @Autowired
     UserSMADetailService userSMAService;
 
-    UserSMA user;
+    HttpSession session;
 
     public LoginController(AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
@@ -42,49 +44,41 @@ public class LoginController {
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody UserSMA loginRequest, 
-                      HttpServletRequest request, 
-                      HttpServletResponse response) {
+                    HttpServletRequest request, 
+                    HttpServletResponse response) {
 
-        
-                UsernamePasswordAuthenticationToken token = 
-                UsernamePasswordAuthenticationToken.unauthenticated(
-                        loginRequest.getUsername(), 
-                        loginRequest.getPassword()
-                        //userSMAService.loadUserByUsername(loginRequest.getUsername()).getAuthorities()
-                );
-        
-        /*
-        // 2. Create an unauthenticated token
-        UsernamePasswordAuthenticationToken token = 
-                UsernamePasswordAuthenticationToken.authenticated(
-                        loginRequest.getUsername(), 
-                        loginRequest.getPassword(),
-                        userSMAService.loadUserByUsername(loginRequest.getUsername()).getAuthorities()
-                );
-        
+        try {
+            UsernamePasswordAuthenticationToken token = UsernamePasswordAuthenticationToken.authenticated(
+                loginRequest.getUsername(), 
+                loginRequest.getPassword(),
+                userSMAService.loadUserByUsername(loginRequest.getUsername()).getAuthorities()
+            );
+                    
+            System.out.println("is authenticated: " + token.isAuthenticated());
+            
+            UserDetails user = userSMAService.loadUserByUsername(loginRequest.getUsername());
+            // 3. Verify user credentials
+            Authentication authentication = authenticationManager.authenticate(token);
+            System.out.println(user.getUsername() + " " + user.getPassword() + " " + user.getAuthorities());
 
-        UserDetails user = userSMAService.loadUserByUsername(loginRequest.getUsername());
-        System.out.println(user.getUsername() + " " + user.getPassword() + " " + user.getAuthorities());
-        Authentication token = new UsernamePasswordAuthenticationToken(
-            user, 
-            null, 
-            user.getAuthorities()
-        );
-        */
+            // 4. Create an empty context and assign the authenticated token
+            SecurityContext context = securityContextHolderStrategy.createEmptyContext();
+            context.setAuthentication(authentication);
 
-        // 3. Verify user credentials
-        Authentication authentication = authenticationManager.authenticate(token);
+            // 5. Update the local thread strategy
+            securityContextHolderStrategy.setContext(context);
 
-        // 4. Create an empty context and assign the authenticated token
-        SecurityContext context = securityContextHolderStrategy.createEmptyContext();
-        context.setAuthentication(authentication);
-
-        // 5. Update the local thread strategy
-        securityContextHolderStrategy.setContext(context);
-
-        // 6. Explicitly save the context to the repository (Session/Cookies)
-        securityContextRepository.saveContext(context, request, response);
-        
+            // 6. Explicitly save the context to the repository (Session/Cookies)
+            securityContextRepository.saveContext(context, request, response);
+        } catch (BadCredentialsException e) {
+            System.out.println(e + " (неправильный логин/пароль)");
+            securityContextHolderStrategy.clearContext();
+            request.getSession().invalidate(); // при удалении сессии из запроса, сессия автоматически удаляется из БД
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Внутренняя ошибка сервера: " +  e);
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
 
         return ResponseEntity.ok("Login success");
     }

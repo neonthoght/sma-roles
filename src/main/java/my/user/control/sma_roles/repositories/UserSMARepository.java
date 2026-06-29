@@ -8,4 +8,6 @@ import java.util.Optional;
 @Repository
 public interface UserSMARepository extends JpaRepository<UserSMA, String> {
     Optional<UserSMA> findByUsername(String username);
+
+    
 }
