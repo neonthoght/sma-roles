@@ -22,8 +22,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.Set;
 import my.user.control.sma_roles.entity.RoleSMA;
+import lombok.Data;
 
-
+@Data
 @Entity
 @Table(name="users", schema = "auth")
 public class UserSMA implements UserDetails { // user of steam market analisys system 
@@ -115,7 +116,7 @@ public class UserSMA implements UserDetails { // user of steam market analisys s
         this.email = email;
     }
 
-        UUID getToken() {
+    public UUID getToken() {
         return this.token;
     }
 
