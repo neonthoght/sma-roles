@@ -13,14 +13,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Service
 public class UserSMADetailService implements UserDetailsService {
 
-    @Autowired
     public UserSMARepository userRepo;
-
-    @Autowired
     public PasswordEncoder passwordEncoder;
 
-    public UserSMADetailService(UserSMARepository userRepo) {
+    @Autowired
+    public UserSMADetailService(UserSMARepository userRepo, PasswordEncoder passwordEncoder) {
         this.userRepo = userRepo;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public UserDetails loadUserByUsername(String username) {

@@ -13,22 +13,28 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import my.user.control.sma_roles.services.RegistrationSMAService;
+import my.user.control.sma_roles.services.RegistrationService;
 
 @RestController
 @RequestMapping("/auth")
-public class RegistrationSMAController {
+public class RegistrationController {
 
-    ResponseEntity<String> response;
-    @Autowired RegistrationSMAService
-    UserSMA user;
+    private ResponseEntity<String> response;
+    private int result = 0;
+    private RegistrationService registrationService;
+    private UserSMA user;
 
-    public RegistrationSMAController(){}
+    @Autowired
+    public RegistrationController(RegistrationService registrationService) {
+        this.registrationService = registrationService;
+    }
+
+    public RegistrationController(){}
 
     @PostMapping(value="/signup")
     public ResponseEntity<String> signup(@RequestBody UserSMA user, HttpSession session) throws Exception {
-        System.out.println(user.username + user.password);
-        result = gateService.signup(user.username, user.password, user.email, session);
+        System.out.println(user.getUsername() + user.getPassword());
+        result = registrationService.signup(user.getUsername(), user.getPassword(), user.getEmail(), session);
         if (result == 0) {
             response = ResponseEntity.status(200).body("user created!");
         } 
@@ -45,7 +51,7 @@ public class RegistrationSMAController {
     
     @GetMapping(value="/verify")
     public ResponseEntity<String> verifyEmail(@RequestParam UUID token) {
-        gateService.verifyEmail(token);
+        registrationService.verifyEmail(token);
         return  response;
     }
 }

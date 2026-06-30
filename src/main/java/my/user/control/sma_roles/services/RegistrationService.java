@@ -13,21 +13,28 @@ import my.user.control.sma_roles.entity.UserSMA;
 import my.user.control.sma_roles.repositories.UserSMARepository;
 
 @Service
-public class RegistrationSMAService {
+public class RegistrationService {
     
-    @Autowired public JavaMailSenderImpl mailSender;
-    @Autowired public UserSMARepository userRepository;
-    @Autowired public PasswordEncoder passwordEncoder;
+    public JavaMailSenderImpl mailSender;
+    public UserSMARepository userRepository;
+    public PasswordEncoder passwordEncoder;
     
+
     UUID token;
     UserSMA user;
     public int result = 0; // результат выполнения метода
 
+    @Autowired
+    public RegistrationService (JavaMailSenderImpl mailSender, UserSMARepository userRepository, PasswordEncoder passwordEncoder) {
+        this.mailSender = mailSender;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     // Отправить письмо для подтверждения email
     public void sendVerificationEmail(String recipientEmail, UUID token)throws MailAuthenticationException {
         
-        String confirmationUrl = "http://localhost:8081/auth/verify?token=" + token.toString();
+        String confirmationUrl = "http://localhost:8080/auth/verify?token=" + token.toString();
         
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(recipientEmail);
@@ -56,14 +63,14 @@ public class RegistrationSMAService {
     }
 
     // Зарегистрировать пользователя
-    // 0 - успешно создан, 
+    // 0 - успешно создан,
     // 1 - пользователь уже существует
     // 2 - email уже используется
     public int signup(String username, String password, String email, HttpSession session) throws Exception {
         
         if (userExists(username)) {
             result = 1;
-        } 
+        }
         else if (emailExists(email)) {
             result = 2;
         }
