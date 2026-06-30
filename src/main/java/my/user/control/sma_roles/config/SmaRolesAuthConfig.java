@@ -30,6 +30,8 @@ public class SmaRolesAuthConfig {
             .securityMatcher("/auth/**")
             .authorizeHttpRequests( req -> req.requestMatchers("/auth/login").permitAll())
             .authorizeHttpRequests( req -> req.requestMatchers("/auth/signup").permitAll())
+            .authorizeHttpRequests( req -> req.requestMatchers("/auth/confirm-reset-password").permitAll())
+            .authorizeHttpRequests( req -> req.requestMatchers("/auth/reset-password").permitAll())
             .authorizeHttpRequests( req -> req.requestMatchers("/auth/verify").permitAll())
             .authorizeHttpRequests( req -> req.requestMatchers("/auth/hello").hasRole("HELLO"))
             .authorizeHttpRequests( req -> req.requestMatchers("/auth/**").authenticated())

@@ -56,7 +56,7 @@ public class ResetPasswordService {
     }
 
     // Найти пользователя по токену и изменить у него пароль
-    public void resetPassword (String recipientEmail, UUID token) {
+    public void resetPassword (UUID token) {
 
         
         RandomStringGenerator generator = new RandomStringGenerator.Builder().selectFrom("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789#&!".toCharArray()).get();
@@ -71,7 +71,7 @@ public class ResetPasswordService {
 
         //Отправить новый пароль на почту
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(recipientEmail);
+        message.setTo(user.getEmail());
         message.setSubject("Новый пароль");
         message.setText("Пользователь " + user.getUsername() + " пароль " + newPassword);
         

@@ -42,11 +42,11 @@ public class ResetPasswordController {
     }
 
     //сбросить пароль и отправить новый пароль на почту
-    @PutMapping("/reset-password")
-    public ResponseEntity<String> resetPassword(@RequestParam UUID token, @RequestBody UserSMA user, HttpSession session) {
+    @GetMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestParam UUID token, HttpSession session) {
         try {
-            resetPasswordService.resetPassword(user.getEmail(), token);
-            return response.ok("Пароль сброшен. Новый пароль отправлен на почту " + user.getEmail());
+            resetPasswordService.resetPassword(token);
+            return response.ok("Пароль сброшен. Новый пароль отправлен на почту ");
         } catch (Exception e) {
             return response.badRequest().body(e.getMessage());
         }
