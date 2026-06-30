@@ -31,6 +31,10 @@ public class RegistrationService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    public void changeEmail(UserSMA user) {
+        userRepository.findByUser //найти пользователя по его имени и заменить email
+    }
+
     // Отправить письмо для подтверждения email
     public void sendVerificationEmail(String recipientEmail, UUID token) throws MailAuthenticationException {
         

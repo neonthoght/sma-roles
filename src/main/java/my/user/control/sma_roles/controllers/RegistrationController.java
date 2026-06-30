@@ -54,4 +54,10 @@ public class RegistrationController {
         registrationService.verifyEmail(token);
         return  response;
     }
+
+    // поменять email
+    @PostMapping("/change-email")
+    public ResponseEntity<String> changeEmail(@RequestBody UserSMA user) {
+        registrationService.changeEmail(user.getEmail());
+    }
 }
