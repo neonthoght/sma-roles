@@ -32,7 +32,7 @@ public class RegistrationService {
     }
 
     // Отправить письмо для подтверждения email
-    public void sendVerificationEmail(String recipientEmail, UUID token)throws MailAuthenticationException {
+    public void sendVerificationEmail(String recipientEmail, UUID token) throws MailAuthenticationException {
         
         String confirmationUrl = "http://localhost:8080/auth/verify?token=" + token.toString();
         
