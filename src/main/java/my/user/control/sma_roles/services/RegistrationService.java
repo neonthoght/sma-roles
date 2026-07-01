@@ -31,8 +31,27 @@ public class RegistrationService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public void changeEmail(UserSMA user) {
-        userRepository.findByUser //найти пользователя по его имени и заменить email
+    // изменить почту и сделать пользователя неактивным. Когда пользователь неактивен - ему не приходят новые уведомления.
+    // Для активации пользователя надо подтвердить новую почту.
+    public int changeEmail(String newEmail, String username) {
+        try {
+            if (userRepository.findByEmail(newEmail).isEmpty()) {
+                user = userRepository.findByUsername(username).get(); //найти пользователя по его имени и заменить email
+                user.setEmail(newEmail);
+                user.setIsActive(false);
+                token = UUID.randomUUID();
+                user.setToken(token);
+                userRepository.save(user);
+                sendVerificationEmail(newEmail, token); // отправить письмо подтверждения смены почты
+                result = 0; //email изменён
+            } else {
+                result = 1; // email уже используется!
+            }
+            return result;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return -1; // ошибка сервера
+        }
     }
 
     // Отправить письмо для подтверждения email

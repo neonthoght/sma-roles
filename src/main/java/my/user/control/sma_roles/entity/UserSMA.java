@@ -41,7 +41,7 @@ public class UserSMA implements UserDetails { // user of steam market analisys s
     String password; 
 
     @Column(name = "email")
-    String email; 
+    String email;
 
     @Column(name = "is_active")
     boolean isActive;

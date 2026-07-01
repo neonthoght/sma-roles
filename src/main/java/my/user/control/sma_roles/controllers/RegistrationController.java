@@ -31,16 +31,17 @@ public class RegistrationController {
 
     public RegistrationController(){}
 
+    // Зарегистрироваться
     @PostMapping(value="/signup")
     public ResponseEntity<String> signup(@RequestBody UserSMA user, HttpSession session) throws Exception {
         System.out.println(user.getUsername() + user.getPassword());
         result = registrationService.signup(user.getUsername(), user.getPassword(), user.getEmail(), session);
         if (result == 0) {
             response = ResponseEntity.status(200).body("user created!");
-        } 
+        }
         else if (result == 2) { // email уже используется
             response = ResponseEntity.status(200).body("email already used!");
-        } 
+        }
         else {
             response = ResponseEntity.status(200).body("user already exists!");
             System.out.println(response);
@@ -49,15 +50,22 @@ public class RegistrationController {
         return response;
     }
     
+    // подтвердить email
     @GetMapping(value="/verify")
     public ResponseEntity<String> verifyEmail(@RequestParam UUID token) {
         registrationService.verifyEmail(token);
+        response = response.ok("Email подтверждён, пользователь теперь активен. Новые уведомления будут приходить на подтвержденную почту.");
         return  response;
     }
 
-    // поменять email
+    // Изменить email
     @PostMapping("/change-email")
     public ResponseEntity<String> changeEmail(@RequestBody UserSMA user) {
-        registrationService.changeEmail(user.getEmail());
+        result = registrationService.changeEmail(user.getEmail(), user.getUsername());
+        switch (result) {
+            case 0: return response = response.ok("Email изменён. Подтвердите его, чтобы уведомления приходили на новый почтовый ящик.");
+            case 1: return response = response.ok("Email уже используется!");
+        }
+        return response;
     }
 }
