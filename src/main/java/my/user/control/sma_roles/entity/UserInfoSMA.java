@@ -12,7 +12,4 @@ public class UserInfoSMA implements Serializable {
     private boolean isActive;
     private String email;
     private ArrayList <String> authorities;
-
-
-
 }

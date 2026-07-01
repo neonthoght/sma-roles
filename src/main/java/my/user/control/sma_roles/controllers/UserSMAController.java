@@ -54,25 +54,29 @@ public class UserSMAController {
 
     @GetMapping("/user-info") // пользователь может получить информацию только о себе, в остальных случаях возвращает ошибку forbidden 403
     public ResponseEntity<UserInfoSMA> getUserInfo(HttpSession session, @RequestParam String username) {
+        System.out.println (session.getAttribute("username") + " " + username + " " + session.getAttribute("username").equals(username));
 
-        UserSMA user = (UserSMA) userService.loadUserByUsername(username);
-        UserInfoSMA userInfo = new UserInfoSMA();
+        if ( session.getAttribute("username").equals(username) ) {
+            UserSMA user = (UserSMA) userService.loadUserByUsername(username);
+            UserInfoSMA userInfo = new UserInfoSMA();
 
-        ArrayList<String> authoritiesInfo = new ArrayList();
+            ArrayList<String> authoritiesInfo = new ArrayList();
 
-        userInfo.setActive(user.getIsActive());
-        userInfo.setUsername(user.getUsername());
+            userInfo.setActive(user.getIsActive());
+            userInfo.setUsername(user.getUsername());
 
-        Iterator<? extends GrantedAuthority> authoritiesIterator = user.getAuthorities().iterator(); 
-        while (authoritiesIterator.hasNext()) {
-            authoritiesInfo.add(authoritiesIterator.next().toString());
+            Iterator<? extends GrantedAuthority> authoritiesIterator = user.getAuthorities().iterator(); 
+            while (authoritiesIterator.hasNext()) {
+                authoritiesInfo.add(authoritiesIterator.next().toString());
+            }
+            userInfo.setAuthorities(authoritiesInfo);
+
+            userInfo.setEmail(user.getEmail());
+
+            response = response.ok().body(userInfo);
+        } else {
+            response.status(403).body("Информацию можно запрашивать только о личном аккаунте!");
         }
-        userInfo.setAuthorities(authoritiesInfo);
-
-        userInfo.setEmail(user.getEmail());
-
-        response = response.ok().body(userInfo);
-
         return response;
     }
 
