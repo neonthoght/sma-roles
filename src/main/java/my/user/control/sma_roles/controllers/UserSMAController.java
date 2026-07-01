@@ -1,6 +1,7 @@
 package my.user.control.sma_roles.controllers;
 
 import my.user.control.sma_roles.entity.ChangePasswordSMA;
+import my.user.control.sma_roles.entity.UserInfoSMA;
 import my.user.control.sma_roles.entity.UserSMA;
 import my.user.control.sma_roles.repositories.UserSMARepository;
 
@@ -20,6 +21,7 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -33,19 +35,45 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import my.user.control.sma_roles.services.UserSMADetailService;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 @Controller
 @RequestMapping("/auth")
 public class UserSMAController {
     
-    @Autowired
-    public UserSMARepository userRepo;
-    UserSMADetailService userService;
-    //private AuthenticationManager authenticationManager;
-
-    public UserSMAController (UserSMADetailService userService) {
+    private UserSMARepository userRepo;
+    private UserSMADetailService userService;
+    private ResponseEntity<UserInfoSMA> response;
+    
+    public UserSMAController (UserSMADetailService userService, UserSMARepository userRepo) {
         this.userService = userService;
+        this.userRepo = userRepo;
 
+    }
+
+    @GetMapping("/user-info") // пользователь может получить информацию только о себе, в остальных случаях возвращает ошибку forbidden 403
+    public ResponseEntity<UserInfoSMA> getUserInfo(HttpSession session, @RequestParam String username) {
+
+        UserSMA user = (UserSMA) userService.loadUserByUsername(username);
+        UserInfoSMA userInfo = new UserInfoSMA();
+
+        ArrayList<String> authoritiesInfo = new ArrayList();
+
+        userInfo.setActive(user.getIsActive());
+        userInfo.setUsername(user.getUsername());
+
+        Iterator<? extends GrantedAuthority> authoritiesIterator = user.getAuthorities().iterator(); 
+        while (authoritiesIterator.hasNext()) {
+            authoritiesInfo.add(authoritiesIterator.next().toString());
+        }
+        userInfo.setAuthorities(authoritiesInfo);
+
+        userInfo.setEmail(user.getEmail());
+
+        response = response.ok().body(userInfo);
+
+        return response;
     }
 
     @PostMapping("/change-password")
